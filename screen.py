@@ -1,4 +1,3 @@
-#thats a simple text
 import time
 import socketserver
 import http.server
