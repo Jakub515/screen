@@ -1,7 +1,8 @@
+#thats a simple text
 import time
 import socketserver
 import http.server
-import mss  
+import mss
 import io
 import os
 from PIL import Image
