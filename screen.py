@@ -7,7 +7,7 @@ import os
 from PIL import Image
 from urllib.parse import parse_qs
 
-os.system('export DISPLAY=:0')
+os.environ['DISPLAY'] = ':0'
 os.system('xhost +')
 
 URL_USERNAME = "7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463"
@@ -74,6 +74,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     def stream(self):
         with mss.mss() as sct:
             while True:
+                start_time = time.time()
                 screenshot = sct.grab(sct.monitors[1])  # Pobiera cały ekran
 
                 # Konwersja do JPEG zamiast PNG (dużo szybsze)
@@ -92,8 +93,8 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(b'Content-Type: image/jpeg\r\n\r\n')
                 self.wfile.write(img_byte_arr.read())
                 self.wfile.write(b'\r\n')
-
-                time.sleep(0.03)  # 30 FPS
+                print(time.time()-start_time)
+                time.sleep(0.1-(time.time()-start_time))  # 30 FPS
 
 class VideoStreamServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     pass
