@@ -7,8 +7,8 @@ import os
 from PIL import Image
 from urllib.parse import parse_qs
 
-os.system('xhost +')
 os.system('export DISPLAY=:0')
+os.system('xhost +')
 
 URL_USERNAME = "7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463"
 URL_PASSWORD = "b49165cef79dcdb3a9ab89544fb668b8aca19ccfe6256ac5"
