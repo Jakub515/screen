@@ -7,7 +7,7 @@ import os
 from PIL import Image
 from urllib.parse import parse_qs
 
-os.environ['DISPLAY'] = ':1'
+os.environ['DISPLAY'] = ':0'
 os.system('xhost +')
 
 URL_USERNAME = "7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463"
@@ -47,9 +47,9 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         elif self.path == "/auth/"+URL_USERNAME+"/"+URL_PASSWORD:
             self.send_response(200)
-            self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=frame')
+            self.send_header('Content-Type', 'text/html')
             self.end_headers()
-            self.stream()
+            self.wfile.write('Logowanie udane. Czekaj na załadowanie streamingu.'.encode('utf-8'))
         else:
             pass
 
@@ -71,7 +71,20 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.end_headers()
                 self.wfile.write(LOGIN_HTML.encode('utf-8'))
 
+        elif self.path == "/start_stream":
+            # Odebranie żądania POST, uruchomienie streamingu
+            content_length = int(self.headers['Content-Length'])
+            post_data = self.rfile.read(content_length).decode('utf-8')
+
+            # Sprawdzamy, czy jest to prawidłowe żądanie, jeśli tak to zaczynamy streaming
+            if post_data:  # Jeśli post_data zawiera jakiekolwiek dane (czyli żądanie POST zostało otrzymane)
+                self.send_response(200)
+                self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=frame')
+                self.end_headers()
+                self.stream()
+
     def stream(self):
+        # Proces streamingu obrazu
         with mss.mss() as sct:
             while True:
                 start_time = time.time()
@@ -93,8 +106,8 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(b'Content-Type: image/jpeg\r\n\r\n')
                 self.wfile.write(img_byte_arr.read())
                 self.wfile.write(b'\r\n')
-                print(time.time()-start_time)
-                time.sleep(0.1-(time.time()-start_time))  # 30 FPS
+                print(time.time() - start_time)
+                time.sleep(0.1 - (time.time() - start_time))  # 30 FPS
 
 class VideoStreamServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     pass
