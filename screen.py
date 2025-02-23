@@ -94,8 +94,9 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(b'Content-Type: image/jpeg\r\n\r\n')
                 self.wfile.write(img_byte_arr.read())
                 self.wfile.write(b'\r\n')
-                print(time.time()-start_time)
-                time.sleep(0.14-(time.time()-start_time))  # 30 FPS
+                print("czas: "+str(time.time() - start_time))
+
+                time.sleep(0.14 - (time.time() - start_time))  # 30 FPS
 
                 #czyszczenie zmienych img i img_byte_arr
                 img.close()

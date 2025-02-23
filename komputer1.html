@@ -33,12 +33,11 @@
       box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
       background: #3a4c61;
     }
-    .streaming-image {
-      width: 80%;
-      max-width: 800px;
+    img {
+      width: 95vw; /* Zachowuje proporcje */
       height: auto;
-      border-radius: 15px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+      display: block; /* Usuwa domyślny margines dolny */
+      object-fit: contain; /* Zapobiega przycięciu obrazka */
     }
   </style>
 </head>
