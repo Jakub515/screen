@@ -11,12 +11,16 @@
       margin: 0;
       padding: 0;
       display: flex;
-      justify-content: center;
-      align-items: center;
+      justify-content: center; /* Wyśrodkowanie w poziomie */
+      align-items: center; /* Wyśrodkowanie w pionie */
       height: 100vh;
+      width: 100vw;
       color: #fff;
+      box-sizing: border-box; /* Zapewnia, że padding i margin są uwzględniane w szerokości/wy wysokości */
+      overflow: hidden; /* Zapobiega przewijaniu ekranu */
       flex-direction: column;
     }
+
     .back-button {
       background: #6e7f93;
       color: #fff;
@@ -24,29 +28,80 @@
       border-radius: 10px;
       text-decoration: none;
       font-size: 1.2rem;
-      margin-top: 20px;
+      margin-top: 20px; /* Zwiększono margines, by był oddzielony od obrazu */
+      margin-bottom: 15px;
       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
       transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
     }
+
     .back-button:hover {
       transform: translateY(-5px);
       box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
       background: #3a4c61;
     }
+
+    .image-container {
+      position: relative;
+      width: 100%; /* Obrazek będzie rozciągał się na całą szerokość */
+      height: 100%; /* Obrazek będzie rozciągał się na całą wysokość */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
     img {
-      width: 95vw; /* Zachowuje proporcje */
-      height: auto;
-      display: block; /* Usuwa domyślny margines dolny */
-      object-fit: contain; /* Zapobiega przycięciu obrazka */
+      object-fit: cover; /* Obrazek będzie dopasowany do kontenera, ale zachowa proporcje */
+      transition: transform 0.2s ease-in-out; /* Płynna animacja z szybszym obrotem */
+      max-width: 100vw;
+      max-height: 100vh;
+    }
+
+    .rotate-button {
+      background: #6e7f93;
+      color: white;
+      padding: 15px 25px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
+    }
+
+    .rotate-button:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 25px rgba(0, 0, 0, 0.2);
+      background: #3a4c61;
     }
   </style>
 </head>
 <body>
 
   <h2>Streaming z Linux</h2>
-  <img src="http://192.168.1.22:8000/auth/7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463/b49165cef79dcdb3a9ab89544fb668b8aca19ccfe6256ac5">
+  
+  <div class="image-container" id="imageContainer">
+    <img id="streamImage" src="http://192.168.1.22:8000/auth/7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463/b49165cef79dcdb3a9ab89544fb668b8aca19ccfe6256ac5">
+  </div>
+
+  <button class="rotate-button" id="rotateButton">Obróć obrazek</button>
   <a href="index.html" class="back-button">Wróć do menu</a>
 
+  <script>
+    const imgElement = document.getElementById('streamImage');
+    const rotateButton = document.getElementById('rotateButton');
+    let rotated = false;
+
+    rotateButton.addEventListener('click', () => {
+      rotated = !rotated; // Przełączanie między 0° a 90°
+  
+      if (rotated) {
+        imgElement.style.transform = 'rotate(90deg) scale(1.5)'; // Obrót i powiększenie
+      } else {
+        imgElement.style.transform = 'rotate(0deg) scale(1)'; // Przywrócenie do pierwotnych wartości
+      }
+    });
+  </script>
 </body>
 </html>
 
