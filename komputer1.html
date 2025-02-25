@@ -96,12 +96,15 @@
       rotated = !rotated; // Przełączanie między 0° a 90°
   
       if (rotated) {
-        imgElement.style.transform = 'rotate(90deg) scale(1.5)'; // Obrót i powiększenie
+        imgElement.style.transform = 'rotate(90deg)';
+        imgElement.style.scale = '1.5';
       } else {
-        imgElement.style.transform = 'rotate(0deg) scale(1)'; // Przywrócenie do pierwotnych wartości
+        imgElement.style.transform = 'rotate(0deg)';
+        imgElement.style.scale = '1';
       }
     });
   </script>
+
 </body>
 </html>
 
