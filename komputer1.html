@@ -152,14 +152,14 @@
           iv: CryptoJS.enc.Utf8.parse(secretKey)
         });
 
-        const response = await fetch('http://192.168.1.22:8080/postauth', {
+        const response = await fetch('http://127.125.150.175:8080/postauth', {
           method: 'POST',
           headers: { 'Content-Type': 'text/plain' },
           body: encrypted.toString()
         });
 
         const responseText = await response.text();
-        const streamUrl = `http://192.168.1.22:8080/auth/7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463/b49165cef79dcdb3a9ab89544fb668b8aca19ccfe6256ac5/${responseText}`;
+        const streamUrl = `http://127.125.150.175:8080/auth/7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463/b49165cef79dcdb3a9ab89544fb668b8aca19ccfe6256ac5/${responseText}`;
         
         imgElement.src = streamUrl;
 

@@ -16,6 +16,12 @@ import ssl
 import smtplib
 import uuid
 import base64
+import sys
+
+if getattr(sys, 'frozen', False):  # Jeśli uruchomiono z pliku .exe
+    image_path = os.path.join(sys._MEIPASS, 'logo.png')
+else:
+    image_path = 'logo.png'
 
 SECRET_KEY = b"1234567890123456"
 PASSWORD_APP = "y<Fz9VKgrwhU/2.}}npE7ePL_}ekU#CD"
@@ -36,6 +42,7 @@ LOGIN_HTML = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/icon.png" type="image/png">
     <title>Logowanie</title>
 </head>
 <body>
@@ -58,6 +65,7 @@ VERYFICATION_HTML = """<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/icon.png" type="image/png">
     <title>Weryfikacja</title>
 </head>
 <body>
@@ -79,6 +87,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     global auth_ip
     global uuid_for_url_stream
     global ifDecCorrect
+    global image_path
     auth_ip = []
     def do_GET(self):
         global cookie
@@ -93,6 +102,13 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
 
             self.wfile.write(LOGIN_HTML.encode('utf-8'))
+
+        elif self.path == '/icon.png':
+            self.send_response(200)
+            self.send_header('Content-type', 'image/png')
+            self.end_headers()
+            with open(image_path, 'rb') as file:
+                self.wfile.write(file.read())
 
         elif self.path == "/verify":
             # Sprawdź, czy użytkownik jest autoryzowany
@@ -374,7 +390,7 @@ class VideoStreamServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     pass
 
 def run(port=8080):
-    server_address = ('', port)
+    server_address = ('127.125.150.175', port)
     httpd = VideoStreamServer(server_address, VideoStreamHTTPRequestHandler)
     print(f"Serwer działa na porcie {port}")
     httpd.serve_forever()
