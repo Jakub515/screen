@@ -1,5 +1,5 @@
 pyinstaller==4.10
 socketserver==0.4
-mms=7.0.1
-PIL=8.4.0
-Crypto=3.21.0
+mms==7.0.1
+PIL==8.4.0
+Crypto==3.21.0
