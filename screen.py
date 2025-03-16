@@ -29,9 +29,12 @@ ADV_USERNAME = config_data[4]
 ADV_PASSWORD = config_data[5]
 
 #test arumentów
-if sys.argv[1] == "setup":
-    subprocess.run(["bash", bash_file, str(pid), str(config_path)])
-    exit()
+try:
+    if sys.argv[1] == "setup":
+        subprocess.run(["bash", bash_file, str(pid), str(config_path)])
+        exit()
+except IndexError:
+    pass
 
 from PIL import Image
 from urllib.parse import parse_qs
