@@ -417,11 +417,11 @@ class VideoStreamServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     pass
 
 def run(port=8080):
-    server_address = (str(IP_ADDRESS), str(PORT_ADRRESS))
+    server_address = (str(IP_ADDRESS), port)
     httpd = VideoStreamServer(server_address, VideoStreamHTTPRequestHandler)
     print(f"Serwer działa na porcie {port}")
     httpd.serve_forever()
 
 if __name__ == "__main__":
     verification_code = ""  # Inicjalizacja zmiennej globalnej
-    run()
+    run(int(PORT_ADRRESS))
