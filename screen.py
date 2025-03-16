@@ -1,3 +1,36 @@
+import sys
+import os
+import subprocess
+
+#get pid-u
+pid = os.getpid()
+
+#wgranie konfiguracji
+def load_config(file_path):
+    with open(file_path, 'r') as file:
+        return [line.strip() for line in file.readlines()]
+
+if getattr(sys, 'frozen', False):  # Jeśli uruchomiono z pliku .exe
+    image_path = os.path.join(sys._MEIPASS, 'logo.png')
+    config_data = load_config(sys._MEIPASS, '.config')
+    bash_file = os.path.join(sys._MEIPASS, 'setup.sh')
+else:
+    image_path = 'logo.png'
+    config_data = load_config('.config')
+    bash_file = 'setup.sh'
+
+SECRET_KEY = config_data[0].encode()
+PASSWORD_APP = config_data[1]
+URL_USERNAME = config_data[2]
+URL_PASSWORD = config_data[3]
+ADV_USERNAME = config_data[4]
+ADV_PASSWORD = config_data[5]
+
+#test arumentów
+if sys.argv[1] == "setup":
+    subprocess.run(["bash", bash_file, str(pid), str(conig_data])
+    exit()
+
 from PIL import Image
 from urllib.parse import parse_qs
 from email.mime.multipart import MIMEMultipart
@@ -16,26 +49,11 @@ import ssl
 import smtplib
 import uuid
 import base64
-import sys
 
-if getattr(sys, 'frozen', False):  # Jeśli uruchomiono z pliku .exe
-    image_path = os.path.join(sys._MEIPASS, 'logo.png')
-else:
-    image_path = 'logo.png'
-
-SECRET_KEY = b"1234567890123456"
-PASSWORD_APP = "y<Fz9VKgrwhU/2.}}npE7ePL_}ekU#CD"
-
-# Ustawienia dla serwera SMTP (dla Gmaila)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "wifi.esp32@gmail.com"  # Twój e-mail
 SENDER_PASSWORD = "hilh wkpm jtot rcze"  # Twoje hasło do e-maila
-
-URL_USERNAME = "7ebd5d66f19edb93fd474a7272a27f4956035afbc152e463"
-URL_PASSWORD = "b49165cef79dcdb3a9ab89544fb668b8aca19ccfe6256ac5"
-ADV_USERNAME = "jakub515.szczurek@gmail.com"
-ADV_PASSWORD = "123"
 
 LOGIN_HTML = """<!DOCTYPE html>
 <html lang="pl">
