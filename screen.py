@@ -4,7 +4,7 @@ import subprocess
 
 #get pid-u
 pid = os.getpid()
-
+print("pid: ",pid)
 #wgranie konfiguracji
 def load_config(file_path):
     with open(file_path, 'r') as file:
@@ -13,11 +13,13 @@ def load_config(file_path):
 if getattr(sys, 'frozen', False):  # Jeśli uruchomiono z pliku .exe
     image_path = os.path.join(sys._MEIPASS, 'logo.png')
     config_data = load_config(sys._MEIPASS, '.config')
-    bash_file = os.path.join(sys._MEIPASS, 'setup.sh')
+    bash_file = os.path.join(sys._MEIPASS, 'setup.sh')		
+    config_path = (sys._MEIPASS, '.config')
 else:
     image_path = 'logo.png'
     config_data = load_config('.config')
     bash_file = 'setup.sh'
+    config_path = ".config"
 
 SECRET_KEY = config_data[0].encode()
 PASSWORD_APP = config_data[1]
@@ -28,7 +30,7 @@ ADV_PASSWORD = config_data[5]
 
 #test arumentów
 if sys.argv[1] == "setup":
-    subprocess.run(["bash", bash_file, str(pid), str(conig_data])
+    subprocess.run(["bash", bash_file, str(pid), str(config_path)])
     exit()
 
 from PIL import Image
