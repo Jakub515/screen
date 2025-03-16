@@ -11,10 +11,10 @@ def load_config(file_path):
         return [line.strip() for line in file.readlines()]
 
 if getattr(sys, 'frozen', False):  # Jeśli uruchomiono z pliku .exe
+    config_path = os.path.join(sys._MEIPASS, '.config')
     image_path = os.path.join(sys._MEIPASS, 'logo.png')
-    config_data = load_config(sys._MEIPASS, '.config')
+    config_data = load_config(config_path)
     bash_file = os.path.join(sys._MEIPASS, 'setup.sh')		
-    config_path = (sys._MEIPASS, '.config')
 else:
     image_path = 'logo.png'
     config_data = load_config('.config')
