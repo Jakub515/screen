@@ -22,7 +22,7 @@ done
 # Tablica do przechowywania danych
 declare -a data_array
 
-echo "Wprowadź 5 danych do zapisania w pliku $2"
+echo "Wprowadź 8 danych do zapisania w pliku $2"
 
 # Tworzymy kopię pliku konfiguracyjnego, aby zachować oryginalne dane
 temp_file=$(mktemp)
@@ -115,13 +115,44 @@ else
     data_array+=($(sed -n '6p' "$temp_file"))  # Dodaj istniejącą wartość z pliku
 fi
 
+# 7. Siódmy input - adres IP (127.0-255.0-255.0-255)
+while true; do
+    echo "Wprowadź adres IP (format: 127.0-255.0-255.0-255):"
+    read ip
+    if [[ "$ip" =~ ^(127|1[2-9][0-9]|2[0-4][0-9]|25[0-5])(\.(0|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$ ]]; then
+        data_array+=("$ip")
+        break
+    elif [ -z "$ip" ]; then
+        data_array+=($(sed -n '7p' "$temp_file"))  # Dodaj istniejącą wartość z pliku
+        break
+    else
+        echo "Błąd! Wprowadź poprawny adres IP."
+    fi
+done
+
+# 8. Ósmy input - port (1024-49151)
+while true; do
+    echo "Wprowadź port (zakres: 1024-49151):"
+    read port
+    if [[ "$port" =~ ^([1-9][0-9]{3}|[1-4][0-9]{4}|4915[0-1])$ ]]; then
+        data_array+=("$port")
+        break
+    elif [ -z "$port" ]; then
+        data_array+=($(sed -n '8p' "$temp_file"))  # Dodaj istniejącą wartość z pliku
+        break
+    else
+        echo "Błąd! Wprowadź port w zakresie 1024-49151."
+    fi
+done
+
 # Zapisz dane w pliku konfiguracyjnym
 # Nadpisz plik z danymi z tablicy, ale jeśli dane były puste, zostaną one pominięte
 line_index=1
 for entry in "${data_array[@]}"; do
-    sed -i "${line_index}s/.*/$entry/" "$2"  # Zaktualizuj odpowiednią linię w pliku
+    echo $entry
+    safe_entry=$(printf '%s' "$entry" | sed 's/[&/\]/\\&/g; s/[][\.*^$(){}?+|]/\\&/g')
+    sed -i "${line_index}s|.*|$safe_entry|" "$2"
     ((line_index++))
 done
 
 echo "Dane zostały zapisane w pliku $2."
-

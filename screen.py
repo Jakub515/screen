@@ -28,6 +28,10 @@ URL_PASSWORD = config_data[3]
 ADV_USERNAME = config_data[4]
 ADV_PASSWORD = config_data[5]
 
+IP_ADDRESS = config_data[6]
+PORT_ADRRESS = config_data[7]
+
+
 #test arumentów
 try:
     if sys.argv[1] == "setup":
@@ -407,13 +411,13 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     gc.collect()
                 except BrokenPipeError as e:
                     print(e)
-                    break 
+                    break
 
 class VideoStreamServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     pass
 
 def run(port=8080):
-    server_address = ('127.125.150.175', port)
+    server_address = (str(IP_ADDRESS), str(PORT_ADRRESS))
     httpd = VideoStreamServer(server_address, VideoStreamHTTPRequestHandler)
     print(f"Serwer działa na porcie {port}")
     httpd.serve_forever()
