@@ -59,6 +59,9 @@ import smtplib
 import uuid
 import base64
 
+CERT_FILE = "server.crt"
+KEY_FILE = "server.key"
+
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "wifi.esp32@gmail.com"  # Twój e-mail
@@ -417,9 +420,11 @@ class VideoStreamServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     pass
 
 def run(port=8080):
-    server_address = (str(IP_ADDRESS), port)
+    server_address = ("", port)
     httpd = VideoStreamServer(server_address, VideoStreamHTTPRequestHandler)
     print(f"Serwer działa na porcie {port}")
+    httpd.socket = ssl.wrap_socket(httpd.socket, keyfile="server.key", certfile="server.crt", server_side=True)
+    print('ok')
     httpd.serve_forever()
 
 if __name__ == "__main__":
