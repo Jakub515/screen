@@ -62,7 +62,7 @@ import base64
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
 SENDER_EMAIL = "wifi.esp32@gmail.com"  # Twój e-mail
-SENDER_PASSWORD = "hilh wkpm jtot rcze"  # Twoje hasło do e-maila
+SENDER_PASSWORD = "qmbh sbzx nbsr nckf "  # Twoje hasło do e-maila
 
 LOGIN_HTML = """<!DOCTYPE html>
 <html lang="pl">
