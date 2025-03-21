@@ -14,12 +14,16 @@ if getattr(sys, 'frozen', False):  # Jeśli uruchomiono z pliku .exe
     config_path = os.path.join(sys._MEIPASS, '.config')
     image_path = os.path.join(sys._MEIPASS, 'logo.png')
     config_data = load_config(config_path)
-    bash_file = os.path.join(sys._MEIPASS, 'setup.sh')		
+    bash_file = os.path.join(sys._MEIPASS, 'setup.sh')	
+    CERT_FILE = os.path.join(sys._MEIPASS, 'server.crt')
+    KEY_FILE = os.path.join(sys._MEIPASS, 'server.key')
 else:
     image_path = 'logo.png'
     config_data = load_config('.config')
     bash_file = 'setup.sh'
     config_path = ".config"
+    CERT_FILE = "server.crt"
+    KEY_FILE = "server.key"
 
 SECRET_KEY = config_data[0].encode()
 PASSWORD_APP = config_data[1]
@@ -59,8 +63,7 @@ import smtplib
 import uuid
 import base64
 
-CERT_FILE = "server.crt"
-KEY_FILE = "server.key"
+
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -119,12 +122,18 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
     global ifDecCorrect
     global image_path
     auth_ip = []
+    def send_cors_headers(self):
+        """Ustawia nagłówki CORS."""
+        self.send_header("Access-Control-Allow-Origin", "*")  # Pozwala na dostęp z każdej domeny
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
     def do_GET(self):
         global cookie
         if self.path == "/auth/":
             cookie = SimpleCookie(self.headers.get('Cookie'))
             self.send_response(200)
             self.send_header('Content-Type', 'text/html')
+            self.send_cors_headers()
             self.clear_cookies()
             self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             self.send_header('Pragma', 'no-cache')
@@ -136,6 +145,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         elif self.path == '/icon.png':
             self.send_response(200)
             self.send_header('Content-type', 'image/png')
+            self.send_cors_headers()
             self.end_headers()
             with open(image_path, 'rb') as file:
                 self.wfile.write(file.read())
@@ -147,6 +157,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(200)
 
                 self.send_header('Content-Type', 'text/html')
+                self.send_cors_headers()
                 self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
                 self.send_header('Pragma', 'no-cache')
                 self.send_header('Expires', '0')
@@ -156,6 +167,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_response(302)
                 self.send_header('Location', '/auth/')
+                self.send_cors_headers()
                 self.end_headers()
 
         elif self.path.startswith("/auth/"+URL_USERNAME+"/"+URL_PASSWORD):
@@ -168,6 +180,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                             auth_ip.remove(i)
                             self.send_response(200)
                             self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=frame')
+                            self.send_cors_headers()
                             self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
                             self.send_header('Pragma', 'no-cache')
                             self.send_header('Expires', '0')
@@ -188,6 +201,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             if cookie.get('acceptStream') and cookie['acceptStream'].value in lista_uuid_stream:
                 self.send_response(200)
                 self.send_header('Content-Type', 'multipart/x-mixed-replace; boundary=frame')
+                self.send_cors_headers()
                 self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
                 self.send_header('Pragma', 'no-cache')
                 self.send_header('Expires', '0')
@@ -197,6 +211,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_response(302)
                 self.send_header('Location', '/auth/')
+                self.send_cors_headers()
                 self.end_headers()
         else:
             pass
@@ -229,7 +244,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
 
                 # Odpowiedź do klienta
                 self.send_response(200)
-                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_cors_headers()
                 self.send_header("Content-Type", "text/plain; charset=utf-8")
                 self.end_headers()
                 if ifDecCorrect == True:
@@ -256,12 +271,14 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # Ustaw cookie po udanej autoryzacji
                 self.send_response(302)
                 self.send_header('Location', '/verify')
+                self.send_cors_headers()
                 self.send_header('Set-Cookie', f"authenticated={special_uuid}; Path=/")
                 self.end_headers()
                 lista_uuid.append(special_uuid)
             else:
                 self.send_response(401)
                 self.send_header('Content-Type', 'text/html')
+                self.send_cors_headers()
                 self.end_headers()
                 self.wfile.write(LOGIN_HTML.encode('utf-8'))
 
@@ -278,6 +295,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                 if entered_code == verification_code:
                     self.send_response(302)
                     self.send_header('Location', '/stream')
+                    self.send_cors_headers()
                     self.clear_cookie("authenticated")
                     special_uuid_stream = str(uuid.uuid4())
                     self.send_header('Set-Cookie', f"acceptStream={special_uuid_stream}; Path=/")
@@ -288,6 +306,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     # Jeśli kod jest niepoprawny, wyświetlamy komunikat o błędzie
                     self.send_response(401)
                     self.send_header('Content-Type', 'text/html')
+                    self.send_cors_headers()
                     self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
                     self.send_header('Pragma', 'no-cache')
                     self.send_header('Expires', '0')
@@ -296,14 +315,13 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             else:
                 self.send_response(302)
                 self.send_header('Location', '/auth/')
+                self.send_cors_headers()
                 self.end_headers()
 
     def do_OPTIONS(self):
         """Obsługa zapytań preflight CORS"""
         self.send_response(200)
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-thods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_cors_headers()
         self.end_headers()
 
     def decrypt_password(self, encrypted_password):
@@ -332,6 +350,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
         cookie['acceptStream']['max-age'] = 0
         # Wysyłanie nagłówków do wyczyszczenia ciastecz
         self.send_header('Set-Cookie', cookie.output(header="", sep="").strip())
+        self.send_cors_headers()
 
     def clear_cookie(self,cookie_name):
         if cookie_name == "authenticated":
@@ -345,6 +364,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
             cookie['acceptStream']['path'] = '/'
             cookie['acceptStream']['max-age'] = 0
         self.send_header('Set-Cookie', cookie.output().strip())
+        self.send_cors_headers()
 
     def generate_verification_code(self):
         """Generuje losowy kod weryfikacyjny."""
@@ -390,6 +410,7 @@ class VideoStreamHTTPRequestHandler(http.server.SimpleHTTPRequestHandler):
                     img_byte_arr.seek(0)
     
                     self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                    self.send_cors_headers()
                     self.send_header('Pragma', 'no-cache')
                     self.send_header('Expires', '0')
 
@@ -420,10 +441,10 @@ class VideoStreamServer(socketserver.ThreadingMixIn, http.server.HTTPServer):
     pass
 
 def run(port=8080):
-    server_address = ("", port)
+    server_address = (IP_ADDRESS, port)
     httpd = VideoStreamServer(server_address, VideoStreamHTTPRequestHandler)
     print(f"Serwer działa na porcie {port}")
-    httpd.socket = ssl.wrap_socket(httpd.socket, keyfile="server.key", certfile="server.crt", server_side=True)
+    httpd.socket = ssl.wrap_socket(httpd.socket, keyfile=KEY_FILE, certfile=CERT_FILE, server_side=True)
     print('ok')
     httpd.serve_forever()
 
